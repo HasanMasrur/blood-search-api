@@ -5,11 +5,11 @@ import { AuthService } from './auth.service';
 export class AuthController {
     constructor (private readonly AuthService:AuthService){
     }
-    @Post()
+    @Post("send-otp")
     async create(){
 const data = await this.AuthService.otpCreate();
     }
-    
+
 @Get()
 async get(){
     const data = await this.AuthService.otpCreate();
