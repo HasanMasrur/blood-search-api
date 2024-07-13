@@ -11,6 +11,7 @@ async function bootstrap() {
   }));
   app.use(json({ limit: '5mb' }));
   app.setGlobalPrefix('api');
-  await app.listen(3000);
+  console.log(process.env.PORT);
+  await app.listen(process.env.PORT || 3001);
 }
 bootstrap();
