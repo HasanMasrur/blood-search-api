@@ -17,7 +17,11 @@ export class AuthService extends Service<Otp> {
         const user = await this.findAllByQuery({ phone_number: createOtpDto.phone_number, });
         const otp_code = Math.floor(100000 + Math.random() * 900000);
         if (!user || !user.length) {
-
+            const modifiedDto = {
+                ...createOtpDto, otp_code: otp_code, time_limit: Date.now(), attempt_at: 1,
+                location: { coordinates: [createOtpDto.location.lng, createOtpDto.location.lat] }
+            }
+            return await this.createOne(modifiedDto);
         } else {
             if (user[0].attempt_at <=10) {
                 const updateOtp = {
@@ -35,12 +39,7 @@ export class AuthService extends Service<Otp> {
             }
 
         }
-
-        const modifiedDto = {
-            ...createOtpDto, otp_code: otp_code, time_limit: Date.now(), attempt_at: 1,
-            location: { coordinates: [createOtpDto.location.lng, createOtpDto.location.lat] }
-        }
-        return await this.createOne(modifiedDto);
+       
     }
     async otpVerify(otpVerifyDto: OtpVerifyDto) {
         const otp = await this.findAllByQuery({ phone_number: otpVerifyDto.phone_number, otp_code: otpVerifyDto.otp_code });
