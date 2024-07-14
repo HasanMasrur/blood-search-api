@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOtpDto } from './dto/auth.dto';
+import { CreateOtpDto } from './dto/otp.dto';
 import { Service } from 'src/common/service.common';
 import { Otp } from './schema/otp.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { OtpVerifyDto } from './dto/otpVerify.dto';
 
 @Injectable()
 export class AuthService extends Service<Otp> {
@@ -21,7 +22,15 @@ export class AuthService extends Service<Otp> {
         }
         return await this.createOne(modifiedDto);
     }
-    async otpVerify() {
-
+    async otpVerify(otpVerifyDto:OtpVerifyDto) {
+        const otp = await this.findAllByQuery({phone_number:otpVerifyDto.phone_number,otp_code:otpVerifyDto.otp_code});
+       if(otp.length>0){
+        return otp[0] ;
+       }else {
+        return {
+            "message": "The OTP you entered is incorrect. Please try again"
+        };
+       }
+        return otp;
     }
 }
