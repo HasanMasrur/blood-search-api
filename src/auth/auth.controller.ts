@@ -3,10 +3,13 @@ import { AuthService } from './auth.service';
 import { CreateOtpDto } from './dto/otp.dto';
 import {OtpVerifyDto} from './dto/otpVerify.dto';
 import { log } from 'console';
+import { UserService } from 'src/user/user.service';
+import { async } from 'rxjs/internal/scheduler/async';
+
 
 @Controller('auth')
 export class AuthController {
-    constructor (private readonly AuthService:AuthService){
+    constructor (private readonly AuthService:AuthService,private readonly UserService:UserService){
     }
     @Post("send-otp")
     async create(@Body() CreateOtpDto :CreateOtpDto){
@@ -18,8 +21,12 @@ return data;
     @Post("otp-verify")
     async verify(@Body() OtpVerifyDto :OtpVerifyDto){
         console.log(OtpVerifyDto);
-const data = await this.AuthService.otpVerify(OtpVerifyDto);
-return data;
+const otp = await this.AuthService.otpVerify(OtpVerifyDto);
+
+  
+ return otp ;
+    
+
     }
 
 

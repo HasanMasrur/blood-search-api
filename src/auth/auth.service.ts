@@ -5,11 +5,15 @@ import { Otp } from './schema/otp.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { OtpVerifyDto } from './dto/otpVerify.dto';
+import { UserService } from 'src/user/user.service';
+import { UserDto } from 'src/user/dto/create-user.dto';
 
 @Injectable()
 export class AuthService extends Service<Otp> {
 
-    constructor(@InjectModel(Otp.name) OtpModel: Model<Otp>) {
+    constructor(
+        private readonly userService: UserService,
+        @InjectModel(Otp.name) OtpModel: Model<Otp>) {
         super(OtpModel);
     }
 
@@ -44,12 +48,31 @@ export class AuthService extends Service<Otp> {
     async otpVerify(otpVerifyDto: OtpVerifyDto) {
         const otp = await this.findAllByQuery({ phone_number: otpVerifyDto.phone_number, otp_code: otpVerifyDto.otp_code });
         if (otp.length > 0) {
-            return otp[0];
+  
+           
+         
+            const userDto = {
+                 fcm_token: otp[0].fcm_token,
+                 app_key: otp[0].app_key,
+                 device_id: otp[0].device_id,
+                 login_type: "normal",
+                 contact:
+                 {
+                     phone:otp[0].phone_number,
+                     country_code:otp[0].country_code,
+                  
+                     fullName:null,
+                 },
+                 location:otp[0].location};
+                 
+          const user = await   this.userService.create(userDto);
+          console.log("user"+user);
+          return user;
         } else {
             return {
                 "message": "The OTP you entered is incorrect. Please try again"
             };
         }
-        return otp;
+  
     }
 }

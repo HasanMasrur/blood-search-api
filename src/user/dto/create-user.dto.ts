@@ -1,3 +1,4 @@
+import { Optional } from "@nestjs/common";
 import { Type } from "class-transformer";
 import { IsEmail, IsEmpty, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested, isNotEmpty } from "class-validator";
 
@@ -18,9 +19,7 @@ export class ContactInfo {
     @IsString()
     fullName: string;
 
-    @IsOptional()
-    @IsEmail()
-    email: string;
+
 
     @IsOptional()
     @IsString()
@@ -31,7 +30,6 @@ export class ContactInfo {
     country_code: String;
 }
 export class UserDto {
-
 
 
     @IsNotEmpty()
@@ -50,7 +48,7 @@ export class UserDto {
     @IsString()
     login_type: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @ValidateNested()
     @Type(() => ContactInfo)
     contact: ContactInfo;
