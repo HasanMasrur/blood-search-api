@@ -3,12 +3,15 @@ import { UserDto } from './dto/create-user.dto';
 import { Service } from "src/common/service.common";
 import { User } from './entities/user.entity';
 import { Model } from 'mongoose';
+import { JwtService } from "@nestjs/jwt";
 import { InjectModel } from '@nestjs/mongoose';
 import { UserLogingDto } from './dto/user-loging.dto';
 import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UserService extends Service<User>{
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {
+  
+  constructor(@InjectModel(User.name) private userModel: Model<User>, 
+  private jwtService: JwtService,) {
     super(userModel);
   }
   async create(@Body()  userDto: UserDto) {
@@ -16,7 +19,7 @@ export class UserService extends Service<User>{
       phone: userDto.phone
     });
     if (userData) {
-      throw new BadRequestException("phone number allready used");
+      throw new BadRequestException("Phone number allready used");
     }
     return await this.createOne(userDto);
   }
@@ -32,7 +35,12 @@ export class UserService extends Service<User>{
      console.log(userData['password']);
       const isMatch = await bcrypt.compare( UserLogingDto.password,userData['password']);
       if (isMatch) {
-        return userData;
+        const token = await this.jwtService.signAsync(
+          { _id:userData['_id'] },
+          { secret: process.env.JWT_SECRECT }
+        );
+
+        return {"accessToken":token,data:userData};
       } else {
         return { message: 'Invalid credentials.' };
       }

@@ -8,12 +8,13 @@ import { OtpVerifyDto } from './dto/otpVerify.dto';
 import { UserService } from 'src/user/user.service';
 import { UserDto } from 'src/user/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from "@nestjs/jwt";
 @Injectable()
 export class AuthService extends Service<Otp> {
 
     constructor(
         private readonly userService: UserService,
-        @InjectModel(Otp.name) OtpModel: Model<Otp>) {
+        @InjectModel(Otp.name) OtpModel: Model<Otp>, private JwtService : JwtService) {
         super(OtpModel);
     }
 
@@ -70,9 +71,21 @@ export class AuthService extends Service<Otp> {
                 };
                 const user = await this.userService.create(userDto);
                 console.log("user" + user);
-                return user;
+                const token = await this.JwtService.signAsync(
+                    { _id:user['_id'] },
+                    { secret: process.env.JWT_SECRECT }
+                  );
+          
+                  return {"accessToken":token,data:user};
+              
             }else{
-                return userData ;
+                console.log("user" + userData);
+                const token = await this.JwtService.signAsync(
+                    { _id:userData['_id'] },
+                    { secret: process.env.JWT_SECRECT }
+                  );
+          
+                  return {"accessToken":token,data:userData};
             }
 ;          
         } else {
