@@ -35,8 +35,7 @@ class ContactInfo {
 
 @Schema({ timestamps: true })
 export class User extends CommonSchema {
-    // @Prop({ type: ContactInfo })
-    // contact: ContactInfo;
+    
     @Prop({ unique: true })
     phone: string;
 
@@ -60,7 +59,7 @@ export class User extends CommonSchema {
 
     @Prop()
     blood_group: string;
-    
+
     @Prop()
     password:string;
 

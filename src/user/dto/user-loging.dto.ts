@@ -3,7 +3,7 @@ import { IsEmail, IsEmpty, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString
 
 
 
-export class LoginUser {
+export class UserLogingDto {
 
     @IsNotEmpty()
     @IsString()
