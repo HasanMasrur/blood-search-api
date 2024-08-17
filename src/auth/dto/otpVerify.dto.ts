@@ -6,6 +6,7 @@ export class OtpVerifyDto {
     @IsNotEmpty()
     @IsString()
     phone_number: string;
+    
     @IsNotEmpty()
     @IsNumber()
     otp_code: number;

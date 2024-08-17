@@ -1,15 +1,7 @@
 import { Type } from "class-transformer";
 import { IsNotEmpty, IsNumber, IsString, ValidateNested } from "class-validator";
 
-export class ILocation {
-    @IsNotEmpty()
-    @IsNumber()
-    lat: number;
 
-    @IsNotEmpty()
-    @IsNumber()
-    lng: number;
-}
 export class CreateOtpDto {
     @IsNotEmpty()
     @IsString()
@@ -17,7 +9,7 @@ export class CreateOtpDto {
 
     @IsNotEmpty()
     @IsString()
-    device_id: string;
+    full_name: string;
 
     @IsNotEmpty()
     @IsString()
@@ -29,15 +21,15 @@ export class CreateOtpDto {
 
     @IsNotEmpty()
     @IsString()
-    fcm_token: string;
+    gender: string;
+    
+    @IsNotEmpty()
+    @IsString()
+    blood_group: string;
 
     @IsNotEmpty()
     @IsString()
-    login_type: string;
-    
-    @IsNotEmpty()
-    @ValidateNested()
-    @Type(() => ILocation)
-    location: ILocation;
+    date_of_birth: string;
+
 
 }

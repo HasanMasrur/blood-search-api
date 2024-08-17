@@ -2,9 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
 import mongoose from "mongoose";
 import { CommonSchema } from "src/common/schema.common";
-
-
-
+import { DeviceInfo } from "./device-info.schema";
 
 // contact info
 @Schema()
@@ -27,45 +25,43 @@ class ContactInfo {
     @Prop()
     date_of_birth: string;
 
-
     @Prop()
     gender: string;
 
     @Prop()
     blood_group: string;
 }
-const pointSchema = new mongoose.Schema({
-    type: {
-        type: String,
-        enum: ['Point'],
-        default: 'Point'
-    },
-    coordinates: {
-        type: [Number],
-        required: true
-    }
-});
+
 
 @Schema({ timestamps: true })
 export class User extends CommonSchema {
+    // @Prop({ type: ContactInfo })
+    // contact: ContactInfo;
+    @Prop({ unique: true })
+    phone: string;
 
-    @Prop({ type: ContactInfo })
-    contact: ContactInfo;
-
-    @Prop({
-        type: pointSchema,
-        required: true
-    })
-    location: any;
+    @Prop({ unique: true })
+    email: string;
 
     @Prop()
-    login_type: string;
+    full_name: string;
 
     @Prop()
-    fcm_token: string;
+    country_code: string;
 
     @Prop()
-    device_id: string;
+    address: string;
+
+    @Prop()
+    date_of_birth: string;
+
+    @Prop()
+    gender: string;
+
+    @Prop()
+    blood_group: string;
+    @Prop({ type: [DeviceInfo] })
+    delivery_addresses: DeviceInfo[];
 
 }
 

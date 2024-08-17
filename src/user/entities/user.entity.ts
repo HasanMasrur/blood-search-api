@@ -21,9 +21,6 @@ class ContactInfo {
     country_code: string;
 
     @Prop()
-    address: string;
-
-    @Prop()
     date_of_birth: string;
 
     @Prop()
@@ -32,17 +29,17 @@ class ContactInfo {
     @Prop()
     blood_group: string;
 }
-const pointSchema = new mongoose.Schema({
-    type: {
-        type: String,
-        enum: ['Point'],
-        default: 'Point'
-    },
-    coordinates: {
-        type: [Number],
-        required: true
-    }
-});
+// const pointSchema = new mongoose.Schema({
+//     type: {
+//         type: String,
+//         enum: ['Point'],
+//         default: 'Point'
+//     },
+//     coordinates: {
+//         type: [Number],
+//         required: true
+//     }
+// });
 
 @Schema({ timestamps: true })
 export class User extends CommonSchema {
@@ -50,20 +47,20 @@ export class User extends CommonSchema {
     @Prop({ type: ContactInfo })
     contact: ContactInfo;
 
-    @Prop({
-        type: pointSchema,
-        required: true
-    })
-    location: any;
+    // @Prop({
+    //     type: pointSchema,
+    //     required: true
+    // })
+    // location: any;
 
-    @Prop()
-    login_type: string;
+    // @Prop()
+    // login_type: string;
 
-    @Prop()
-    fcm_token: string;
+    // @Prop()
+    // fcm_token: string;
 
-    @Prop()
-    device_id: string;
+    // @Prop()
+    // device_id: string;
 
 }
 

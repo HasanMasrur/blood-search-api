@@ -23,56 +23,56 @@ export class AuthService extends Service<Otp> {
         if (!user || !user.length) {
             const modifiedDto = {
                 ...createOtpDto, otp_code: otp_code, time_limit: Date.now(), attempt_at: 1,
-                location: { coordinates: [createOtpDto.location.lng, createOtpDto.location.lat] }
             }
             return await this.createOne(modifiedDto);
         } else {
-            if (user[0].attempt_at <=10) {
+            if (user[0].attempt_at <= 10) {
                 const updateOtp = {
                     otp_code: otp_code,
                     time_limit: Date.now(),
                     attempt_at: user[0].attempt_at + 1,
-                    fcm_token: createOtpDto.fcm_token,
                     app_key: createOtpDto.app_key,
-                    device_id: createOtpDto.device_id,
-                    location: { coordinates: [createOtpDto.location.lng, createOtpDto.location.lat] }
+                    full_name: createOtpDto.full_name,
+                    gender: createOtpDto.gender,
+                    date_of_birth: createOtpDto.date_of_birth,
+                    blood_group: createOtpDto.blood_group,
                 }
+
                 return await this.updateById(user[0]._id, updateOtp);
             } else {
                 throw new BadRequestException('User attemp limit already exist');
             }
-
         }
-       
     }
     async otpVerify(otpVerifyDto: OtpVerifyDto) {
         const otp = await this.findAllByQuery({ phone_number: otpVerifyDto.phone_number, otp_code: otpVerifyDto.otp_code });
         if (otp.length > 0) {
-  
-           
-         
-            const userDto = {
-                 fcm_token: otp[0].fcm_token,
-                 app_key: otp[0].app_key,
-                 device_id: otp[0].device_id,
-                 login_type: "normal",
-                 contact:
-                 {
-                     phone:otp[0].phone_number,
-                     country_code:otp[0].country_code,
-                  
-                     fullName:null,
-                 },
-                 location:otp[0].location};
-                 
-          const user = await   this.userService.create(userDto);
-          console.log("user"+user);
-          return user;
+            const userData = await this.userService.findByPhone(otp[0].phone_number);
+
+            console.log("UserData ::: "+userData);
+            if (!userData ) {
+                const userDto = {
+                    
+                        phone: otp[0].phone_number,
+                        country_code: otp[0].country_code,
+                        full_name: otp[0].full_name,
+                        gender: otp[0].gender,
+                        date_of_birth: otp[0].date_of_birth,
+                        blood_group: otp[0].blood_group,
+                    
+                };
+                const user = await this.userService.create(userDto);
+                console.log("user" + user);
+                return user;
+            }else{
+                return userData ;
+            }
+;          
         } else {
             return {
                 "message": "The OTP you entered is incorrect. Please try again"
             };
         }
-  
+
     }
 }

@@ -11,7 +11,7 @@ export class UserService extends Service<User>{
   }
   async create(@Body()  userDto: UserDto) {
     const userData = await this.findOneByQuery({
-      phone_number: userDto.contact.phone
+      phone: userDto.phone
     });
 
     if (userData) {
@@ -23,11 +23,21 @@ export class UserService extends Service<User>{
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+ async findByPhone(phone_number: String) {
+
+  console.log("number"+phone_number);
+    const userData = await this.findOneByQuery({
+     phone:phone_number,
+    });
+    // if (userData) {
+    //   throw new BadRequestException("phone number allready used");
+    // }
+    return userData;
   }
 
-  
+  findOne(id: number) {
+    return `This action removes a #${id} user`;
+  }
 
   remove(id: number) {
     return `This action removes a #${id} user`;

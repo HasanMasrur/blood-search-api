@@ -1,25 +1,13 @@
-import { Optional } from "@nestjs/common";
-import { Type } from "class-transformer";
-import { IsEmail, IsEmpty, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested, isNotEmpty } from "class-validator";
+
+import { IsEmail, IsEmpty, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested, isNotEmpty, isString } from "class-validator";
 
 
-export class ILocation {
-    @IsNotEmpty()
-    @IsNumber()
-    lat: number;
 
-    @IsNotEmpty()
-    @IsNumber()
-    lng: number;
-}
+export class UserDto {
 
-
-export class ContactInfo {
     @IsOptional()
     @IsString()
-    fullName: string;
-
-
+    full_name: string;
 
     @IsOptional()
     @IsString()
@@ -28,44 +16,18 @@ export class ContactInfo {
     @IsOptional()
     @IsString()
     country_code: String;
-}
-export class UserDto {
-
-
-    @IsNotEmpty()
-    @IsString()
-    fcm_token: string;
-
-    @IsNotEmpty()
-    @IsString()
-    app_key: string;
-
-    @IsNotEmpty()
-    @IsString()
-    device_id: string;
-
-    @IsNotEmpty()
-    @IsString()
-    login_type: string;
 
     @IsOptional()
-    @ValidateNested()
-    @Type(() => ContactInfo)
-    contact: ContactInfo;
+    @IsString()
+    gender:String;
 
-    @IsNotEmpty()
-    @ValidateNested()
-    @Type(() => ILocation)
-    location: ILocation;
+    @IsOptional()
+    @IsString()
+    blood_group:String;
+
+    @IsOptional()
+    @IsString()
+    date_of_birth :String;
 
 }
 
-export class UserLoginDto {
-    @IsNotEmpty()
-    @IsString()
-    User_id: string;
-
-    @IsNotEmpty()
-    @IsString()
-    password: string;
-}
