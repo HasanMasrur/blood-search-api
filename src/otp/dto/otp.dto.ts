@@ -31,5 +31,10 @@ export class CreateOtpDto {
     @IsString()
     date_of_birth: string;
 
+    @IsNotEmpty()
+    @IsString()
+    password: string;
+    
+
 
 }

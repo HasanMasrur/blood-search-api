@@ -13,6 +13,12 @@ export class UserDto {
     @IsString()
     phone: String;
 
+
+    @IsOptional()
+    @IsString()
+    password: String;
+    
+
     @IsOptional()
     @IsString()
     country_code: String;

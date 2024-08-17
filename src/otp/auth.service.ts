@@ -7,7 +7,7 @@ import { Model } from 'mongoose';
 import { OtpVerifyDto } from './dto/otpVerify.dto';
 import { UserService } from 'src/user/user.service';
 import { UserDto } from 'src/user/dto/create-user.dto';
-
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService extends Service<Otp> {
 
@@ -26,6 +26,8 @@ export class AuthService extends Service<Otp> {
             }
             return await this.createOne(modifiedDto);
         } else {
+            const salt = await bcrypt.genSalt();
+            const hash = await bcrypt.hash(createOtpDto.password, salt);
             if (user[0].attempt_at <= 10) {
                 const updateOtp = {
                     otp_code: otp_code,
@@ -36,6 +38,7 @@ export class AuthService extends Service<Otp> {
                     gender: createOtpDto.gender,
                     date_of_birth: createOtpDto.date_of_birth,
                     blood_group: createOtpDto.blood_group,
+                    password:hash,
                 }
 
                 return await this.updateById(user[0]._id, updateOtp);
@@ -51,6 +54,8 @@ export class AuthService extends Service<Otp> {
 
             console.log("UserData ::: "+userData);
             if (!userData ) {
+
+  
                 const userDto = {
                     
                         phone: otp[0].phone_number,
@@ -59,6 +64,8 @@ export class AuthService extends Service<Otp> {
                         gender: otp[0].gender,
                         date_of_birth: otp[0].date_of_birth,
                         blood_group: otp[0].blood_group,
+                        password:otp[0].password,
+
                     
                 };
                 const user = await this.userService.create(userDto);

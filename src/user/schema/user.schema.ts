@@ -60,6 +60,10 @@ export class User extends CommonSchema {
 
     @Prop()
     blood_group: string;
+    
+    @Prop()
+    password:string;
+
     @Prop({ type: [DeviceInfo] })
     delivery_addresses: DeviceInfo[];
 

@@ -28,6 +28,9 @@ class ContactInfo {
 
     @Prop()
     blood_group: string;
+
+    @Prop()
+    password: string;
 }
 // const pointSchema = new mongoose.Schema({
 //     type: {
