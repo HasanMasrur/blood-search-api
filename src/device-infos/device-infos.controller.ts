@@ -7,8 +7,9 @@ import { UpdateDeviceInfoDto } from './dto/update-device-info.dto';
 export class DeviceInfosController {
   constructor(private readonly deviceInfosService: DeviceInfosService) {}
 
-  @Post()
-  create(@Body() createDeviceInfoDto: CreateDeviceInfoDto) {
+  @Post('create')
+  async create(@Body() createDeviceInfoDto: CreateDeviceInfoDto) {
+    console.log(createDeviceInfoDto);
     return this.deviceInfosService.create(createDeviceInfoDto);
   }
 

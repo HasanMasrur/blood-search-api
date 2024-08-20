@@ -15,8 +15,6 @@ export class Otp {
     full_name: string;
     @Prop({required:true})
     password: string;
-
-    
     @Prop({required:true})
     phone_number: string;
 
