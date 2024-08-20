@@ -5,7 +5,7 @@ import { AuthModule } from './otp/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
-import { DeviceInfoModule } from './device-info/device-info.module';
+import { DeviceInfosModule } from './device-infos/device-infos.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -14,7 +14,7 @@ import { DeviceInfoModule } from './device-info/device-info.module';
     MongooseModule.forRoot(process.env.DB_URL),
     AuthModule,
     UserModule,
-    DeviceInfoModule
+    DeviceInfosModule
   
   ],
   controllers: [AppController],
