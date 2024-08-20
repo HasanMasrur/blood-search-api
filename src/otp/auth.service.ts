@@ -9,6 +9,7 @@ import { UserService } from 'src/user/user.service';
 import { UserDto } from 'src/user/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from "@nestjs/jwt";
+import { log } from 'console';
 @Injectable()
 export class AuthService extends Service<Otp> {
 
@@ -56,9 +57,9 @@ export class AuthService extends Service<Otp> {
             console.log("UserData ::: "+userData);
             if (!userData ) {
 
-  
+  console.log("ok");
                 const userDto = {
-                    
+                
                         phone: otp[0].phone_number,
                         country_code: otp[0].country_code,
                         full_name: otp[0].full_name,
@@ -66,8 +67,6 @@ export class AuthService extends Service<Otp> {
                         date_of_birth: otp[0].date_of_birth,
                         blood_group: otp[0].blood_group,
                         password:otp[0].password,
-
-                    
                 };
                 const user = await this.userService.create(userDto);
                 console.log("user" + user);
@@ -75,7 +74,6 @@ export class AuthService extends Service<Otp> {
                     { _id:user['_id'] },
                     { secret: process.env.JWT_SECRECT }
                   );
-          
                   return {"accessToken":token,data:user};
               
             }else{
