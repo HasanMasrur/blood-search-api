@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpException, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserLogingDto } from './dto/user-loging.dto';
+import { AuthGuard } from './auth.guard';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 
 @Controller('user')
@@ -22,10 +24,25 @@ export class UserController {
     return this.userService.findOne(+id);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.userService.update(+id, updateUserDto);
-  // }
+  
+  // update user profile
+  @Patch('profile')
+  @UseGuards(AuthGuard)
+  async updateProfile(@Req() req: Request , @Body() updateUserDto: UpdateUserDto,) {
+    try {
+
+      console.log(    req["user"]["_id"]);
+     const data = await this.userService.update( req["user"]["_id"], updateUserDto);
+console.log(data);
+      return {
+        success: true,
+        data,
+       
+      };
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
+  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

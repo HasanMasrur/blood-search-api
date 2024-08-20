@@ -2,11 +2,12 @@ import { BadRequestException, Body, Injectable } from '@nestjs/common';
 import { UserDto } from './dto/create-user.dto';
 import { Service } from "src/common/service.common";
 import { User } from './entities/user.entity';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { JwtService } from "@nestjs/jwt";
 import { InjectModel } from '@nestjs/mongoose';
 import { UserLogingDto } from './dto/user-loging.dto';
 import * as bcrypt from 'bcrypt';
+import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UserService extends Service<User>{
   
@@ -49,6 +50,14 @@ export class UserService extends Service<User>{
     }
 
   }
+
+
+  async update(id: Types.ObjectId, updateUserDto: UpdateUserDto) {
+    console.log("id : "+id);
+    return await this.updateById(id, updateUserDto);
+  }
+
+
 
   findAll() {
     return `This action returns all user`;

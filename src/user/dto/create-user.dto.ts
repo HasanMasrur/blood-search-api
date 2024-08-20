@@ -7,33 +7,31 @@ export class UserDto {
 
     @IsOptional()
     @IsString()
-    full_name: string;
+    full_name?: string;
 
     @IsOptional()
     @IsString()
-    phone: String;
-
+    phone?: String;
 
     @IsOptional()
     @IsString()
-    password: String;
+    password?: String;
     
+    @IsOptional()
+    @IsString()
+    country_code?: String;
 
     @IsOptional()
     @IsString()
-    country_code: String;
+    gender?:String;
 
     @IsOptional()
     @IsString()
-    gender:String;
+    blood_group?:String;
 
     @IsOptional()
     @IsString()
-    blood_group:String;
-
-    @IsOptional()
-    @IsString()
-    date_of_birth :String;
+    date_of_birth? :String;
 
 }
 
