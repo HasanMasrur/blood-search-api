@@ -6,10 +6,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { OtpVerifyDto } from './dto/otpVerify.dto';
 import { UserService } from 'src/user/user.service';
-import { UserDto } from 'src/user/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from "@nestjs/jwt";
-import { log } from 'console';
 @Injectable()
 export class AuthService extends Service<Otp> {
 
@@ -23,13 +21,18 @@ export class AuthService extends Service<Otp> {
         const user = await this.findAllByQuery({ phone_number: createOtpDto.phone_number, });
         const otp_code = Math.floor(100000 + Math.random() * 900000);
         if (!user || !user.length) {
+            const salt = await bcrypt.genSalt();
+            const hash = await bcrypt.hash(createOtpDto.password, salt);
+            console.log(hash);
             const modifiedDto = {
-                ...createOtpDto, otp_code: otp_code, time_limit: Date.now(), attempt_at: 1,
+                ...createOtpDto, password:hash, otp_code: otp_code, time_limit: Date.now(), attempt_at: 1,
             }
             return await this.createOne(modifiedDto);
         } else {
             const salt = await bcrypt.genSalt();
             const hash = await bcrypt.hash(createOtpDto.password, salt);
+            console.log(hash);
+     
             if (user[0].attempt_at <= 10) {
                 const updateOtp = {
                     otp_code: otp_code,
