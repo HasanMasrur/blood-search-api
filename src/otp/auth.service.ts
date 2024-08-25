@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateOtpDto } from './dto/otp.dto';
-import { Service } from 'src/common/service.common';
+import { Service } from 'src/common/service/service.common';
 import { Otp } from './schema/otp.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';

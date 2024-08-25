@@ -17,7 +17,24 @@ const pointSchema = new mongoose.Schema({
 });
 
 @Schema({ timestamps: true })
-export class DeviceInfos extends CommonSchema {
+export class DeviceInfos {
+
+    @Prop()
+    country_code: string;
+
+    @Prop()
+    full_name: string;
+    @Prop()
+    user_id: string;
+
+    @Prop()
+    phone_number: string;
+
+    @Prop()
+    email: String;
+
+    @Prop()
+    blood_group: string;
 
     @Prop({
         type: pointSchema,

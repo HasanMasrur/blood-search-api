@@ -4,9 +4,11 @@ import { DeviceInfosController } from './device-infos.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DeviceInfos, deviceInfosSchema } from './schema/device.info.schema';
 import { JwtModule } from '@nestjs/jwt';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports:[
+    UserModule,
     MongooseModule.forFeature([{name:DeviceInfos.name,schema:deviceInfosSchema}]),
     JwtModule.register({
       global: true,

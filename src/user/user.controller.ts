@@ -7,7 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post('login')
   create(@Body() UserLogingDto: UserLogingDto) {
@@ -21,23 +21,22 @@ export class UserController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  //  return this.userService.findOne(+id);
   }
 
-  
+
   // update user profile
   @Patch('profile')
   @UseGuards(AuthGuard)
-  async updateProfile(@Req() req: Request , @Body() updateUserDto: UpdateUserDto,) {
+  async updateProfile(@Req() req: Request, @Body() updateUserDto: UpdateUserDto,) {
     try {
-
-      console.log(    req["user"]["_id"]);
-     const data = await this.userService.update( req["user"]["_id"], updateUserDto);
-console.log(data);
+      console.log(req["user"]["_id"]);
+      const data = await this.userService.update(req["user"]["_id"], updateUserDto);
+      console.log(data);
       return {
         success: true,
         data,
-       
+
       };
     } catch (error) {
       throw new HttpException(error.message, error.status);

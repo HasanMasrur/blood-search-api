@@ -1,6 +1,6 @@
-import { BadRequestException, Body, Injectable } from '@nestjs/common';
+import { BadRequestException, Body, Injectable, NotFoundException, Type } from '@nestjs/common';
 import { UserDto } from './dto/create-user.dto';
-import { Service } from "src/common/service.common";
+import { Service } from "src/common/service/service.common";
 import { User } from './entities/user.entity';
 import { Model, Types } from 'mongoose';
 import { JwtService } from "@nestjs/jwt";
@@ -71,8 +71,12 @@ export class UserService extends Service<User>{
     return userData;
   }
 
-  findOne(id: number) {
-    return `This action removes a #${id} user`;
+ async findOneUser(id: Types.ObjectId) {
+    const userData = await this.findOneById(id);
+    if(!userData){
+      throw new NotFoundException('user not found');
+    }
+     return userData;
   }
 
   remove(id: number) {
