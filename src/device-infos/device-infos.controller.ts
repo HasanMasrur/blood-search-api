@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, HttpException, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, HttpException, Query, Type } from '@nestjs/common';
 import { DeviceInfosService } from './device-infos.service';
 import { CreateDeviceInfoDto } from './dto/create-device-info.dto';
 import { UpdateDeviceInfoDto } from './dto/update-device-info.dto';
 import { AuthGuard } from 'src/user/auth.guard';
 import { UserService } from 'src/user/user.service';
 import { QueryDeviceDto } from './dto/query-user.dto';
+import { MongoIdParams } from 'src/common/dto/common.dto';
 @Controller('device-infos')
 export class DeviceInfosController {
   constructor(private readonly deviceInfosService: DeviceInfosService, private readonly UserService: UserService) {}
@@ -37,9 +38,17 @@ async  findAll(@Query() QueryDeviceDto:QueryDeviceDto) {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDeviceInfoDto: UpdateDeviceInfoDto) {
-    return this.deviceInfosService.update(+id, updateDeviceInfoDto);
+  @UseGuards(AuthGuard)
+  async update(  @Param() { id }: MongoIdParams, @Req() req: Request, @Body() updateDeviceInfoDto: UpdateDeviceInfoDto) {
+    try {
+      console.log(updateDeviceInfoDto);
+    console.log(id);
+    return this.deviceInfosService.update(id,updateDeviceInfoDto);
+    } catch (error) {
+      throw error;
+    }
   }
+
 
   @Delete(':id')
   remove(@Param('id') id: string) {

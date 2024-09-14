@@ -21,36 +21,47 @@ export class DeviceInfosService extends Service<DeviceInfos> {
     const deviceInfo = await this.findAllByQuery({ device_id: createDeviceInfoDto.device_id, });
     const user = await this.userService.findOneUser(id);
     console.log(user);
+    const deviceinfo = {
+      full_name: user['full_name'],
+      user_id: user['_id'],
+      phone_number: user['phone'],
+      country_code: user['country_code'],
+      email: user['email'],
+      blood_group: user['blood_group'],
+      login_status: createDeviceInfoDto.login_status,
+      fcm_token: createDeviceInfoDto.fcm_token,
+      device_id: createDeviceInfoDto.device_id,
+      location: { coordinates: [createDeviceInfoDto.location.lng, createDeviceInfoDto.location.lat] }
+    }
     if (!deviceInfo || !deviceInfo.length) {
-      const deviceinfo = {
-        full_name: user['full_name'],
-        user_id: user['_id'],
-        phone_number: user['phone_number'],
-        country_code: user['country_code'],
-        email: user['email'],
-        blood_group: user['blood_group'],
-        login_status: createDeviceInfoDto.login_status,
-        fcm_token: createDeviceInfoDto.fcm_token,
-        device_id: createDeviceInfoDto.device_id,
-        location: { coordinates: [createDeviceInfoDto.location.lng, createDeviceInfoDto.location.lat] }
-      }
       return await this.createOne(deviceinfo);
     } else {
-      return deviceInfo;
+      console.log(deviceInfo[0]['_id']);
+      return await this.updateById(deviceInfo[0]['_id'], deviceinfo);
+
     }
   }
 
-  async findAll(QueryDeviceDto: QueryDeviceDto) {
-    const { page, limit, ...restQuery } = QueryDeviceDto;
-    return await this.findByPaginate(restQuery, { page, limit });
+  async findAll(queryDeviceDto: QueryDeviceDto) {
+
+
+    const value = {
+      lng: parseInt(queryDeviceDto.lng, 10),
+      lat: parseInt(queryDeviceDto.lat, 10),
+      page: queryDeviceDto.page,
+      limit: queryDeviceDto.limit,
+    }
+    const { page, limit, ...restQuery } = value;
+    return await this.findByPaginateNear(restQuery, { page, limit });
   }
 
   findOne(id: number) {
     return `This action returns a #${id} deviceInfo`;
   }
 
-  update(id: number, updateDeviceInfoDto: UpdateDeviceInfoDto) {
-    return `This action updates a #${id} deviceInfo`;
+  async update(id: Types.ObjectId, updateDeviceInfoDto: UpdateDeviceInfoDto) {
+    console.log("id : " + id);
+    return await this.updateById(id, updateDeviceInfoDto);
   }
 
   remove(id: number) {

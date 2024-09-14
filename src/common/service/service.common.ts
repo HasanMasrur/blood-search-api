@@ -135,5 +135,88 @@ export class Service<TDoc> {
   
   
   }
+  protected async findByPaginateNear(
+    query: object = {},
+    paginate?: IPaginate,
+    lookupStages: any[] = [],
+  ) {
+    const page = Math.abs(Number(paginate?.page || 0) || this.DEFAULT_PAGE);
+    const limit = Math.abs(Number(paginate?.limit || 0) || this.DEFAULT_LIMIT);
 
+    if (query['_id']) {
+      query['_id'] = new mongoose.Types.ObjectId(query['_id']);
+    }
+console.log(query);
+    const data = await this.model.aggregate([
+{
+  $geoNear: {
+    near: { type: "Point", coordinates: [query['lng'], query['lat']] },
+    distanceField: "dist.calculated",
+    maxDistance: 100,  // Specify max distance (in meters)
+    spherical: true
+  }
+},
+      // {
+      //   $match: { ...query, deleted_at: null },
+      // },
+      {
+        $facet: {
+          page: [
+            {
+              $count: 'totalIndex',
+            },
+            {
+              $addFields: {
+                totalPage: { $ceil: { $divide: ['$totalIndex', limit] } },
+                currentPage: page,
+                nextPage: {
+                  $cond: {
+                    if: { $gt: ['$totalPage', page] },
+                    then: page + 1,
+                    else: null,
+                  },
+                },
+                previousPage: {
+                  $cond: { if: { $gt: [page, 1] }, then: page - 1, else: null },
+                },
+                startingIndex: limit * (page - 1) + 1,
+                endingIndex: limit * page,
+                itemsOnCurrentPage: {
+                  $cond: {
+                    if: { $gte: [limit, '$totalIndex'] },
+                    then: '$totalIndex',
+                    else: limit,
+                  },
+                },
+                limit: limit,
+                sortBy: 'created_at',
+                sortOrder: -1,
+              },
+            },
+          ],
+          data: [
+            {
+              $sort: {
+                created_at: -1,
+              },
+            },
+            {
+              $skip: limit * (page - 1),
+            },
+            {
+              $limit: limit,
+            },
+            ...lookupStages,
+          ],
+        },
+      },
+    ]);
+
+    return {
+      page: data?.[0]?.page?.[0],
+      data: data?.[0]?.data,
+    };
+  
+  
+  }
 }

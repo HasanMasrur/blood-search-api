@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { IPaginate } from 'src/common/dto/common.dto';
 
 export class QueryDeviceDto extends IPaginate {
@@ -9,4 +9,12 @@ export class QueryDeviceDto extends IPaginate {
   @IsOptional()
   @IsString()
   search: string;
+
+  @IsOptional()
+  @IsString()
+  lat: string;
+
+  @IsOptional()
+  @IsString()
+  lng: string;
 }
