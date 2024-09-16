@@ -1,8 +1,8 @@
 
-
+export class CreateDeviceInfoDto { }
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
-import { CommonSchema } from "src/common/schema.common";
+
 
 const pointSchema = new mongoose.Schema({
     type: {
@@ -17,7 +17,7 @@ const pointSchema = new mongoose.Schema({
 });
 
 @Schema({ timestamps: true })
-export class DeviceInfos {
+export class BloodRequest {
 
     @Prop()
     country_code: string;
@@ -43,15 +43,15 @@ export class DeviceInfos {
     location: any;
 
     @Prop()
-    fcm_token: string;
+    request_blood_group: string;
 
     @Prop()
-    login_status: boolean;
+    hospital_name: string;
 
     @Prop()
-    device_id: string;
+    contact_number: string;
 
 }
 
 
-export const deviceInfosSchema = SchemaFactory.createForClass(DeviceInfos);
+export const BloodRequestSchema = SchemaFactory.createForClass(BloodRequest);

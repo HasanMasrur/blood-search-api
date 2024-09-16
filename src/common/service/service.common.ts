@@ -219,4 +219,150 @@ console.log(query);
   
   
   }
+
+   // find by query filter and populate
+  // find by query filter and populate
+  async findByQueryFilterAndPopulate({
+    query,
+    paginate,
+    sort,
+    lookupStages = [],
+  }: {
+    query: object;
+    paginate?: IPaginate;
+    sort?: { sortBy: string; sortOrder: number };
+    lookupStages?: any[];
+  }) {
+    const page = Math.abs(Number(paginate?.page || 0) || this.DEFAULT_PAGE);
+    const limit = Math.abs(Number(paginate?.limit || 0) || this.DEFAULT_LIMIT);
+
+    if (query['is_active'] == 'true' || query['is_active'] == 1) {
+      query['is_active'] = true;
+    } else if (query['is_active'] == 'false' || query['is_active'] == 0) {
+      query['is_active'] = false;
+    }
+
+    // sort
+    const sortModified = {};
+    if (sort && sort.sortBy && sort.sortOrder) {
+      if (!(sort.sortOrder == 1 || sort.sortOrder == -1)) {
+        throw new BadRequestException('sortOrder must 1 or -1');
+      }
+      sortModified[sort.sortBy] = Number(sort.sortOrder);
+    } else {
+      sortModified['created_at'] = -1;
+    }
+
+    const data = await this.model.aggregate([
+      {
+        $match: { ...query, deleted_at: null },
+      },
+      {
+        $facet: {
+          page: [
+            {
+              $count: 'totalIndex',
+            },
+            {
+              $addFields: {
+                totalPage: { $ceil: { $divide: ['$totalIndex', limit] } },
+                currentPage: page,
+                nextPage: {
+                  $cond: {
+                    if: { $gt: ['$totalPage', page] },
+                    then: page + 1,
+                    else: null,
+                  },
+                },
+                previousPage: {
+                  $cond: { if: { $gt: [page, 1] }, then: page - 1, else: null },
+                },
+                startingIndex: limit * (page - 1) + 1,
+                endingIndex: limit * page,
+                itemsOnCurrentPage: {
+                  $cond: {
+                    if: { $gte: [limit, '$totalIndex'] },
+                    then: '$totalIndex',
+                    else: limit,
+                  },
+                },
+                limit: limit,
+                sortBy: Object.keys(sortModified)[0],
+                sortOrder: sortModified[Object.keys(sortModified)[0]],
+              },
+            },
+          ],
+          data: [
+            {
+              $sort: { ...sortModified },
+            },
+            {
+              $skip: limit * (page - 1),
+            },
+            {
+              $limit: limit,
+            },
+            ...lookupStages,
+          ],
+        },
+      },
+    ]);
+
+    return {
+      page: data?.[0]?.page?.[0],
+      data: data?.[0]?.data,
+    };
+  }
+// find all documents by query
+protected async findAllByQueryPagination(query: object, paginate: IPaginate) {
+  const page = Math.abs(Number(paginate?.page || 0) || this.DEFAULT_PAGE);
+  const limit = Math.abs(Number(paginate?.limit || 0) || this.DEFAULT_LIMIT);
+
+  let totalIndexPromise: Promise<any>;
+  let totalDeletedIndexPromise: Promise<any>;
+
+
+  if (Object.keys(query).length) {
+    totalIndexPromise = this.model.countDocuments({ ...query, deleted_at: null });
+  } else {
+    totalIndexPromise = this.model.estimatedDocumentCount();
+    totalDeletedIndexPromise = this.model.countDocuments({ deleted_at: { $ne: null } });
+  }
+
+  const dataPromise = this.model.find({ ...query, deleted_at: null })
+    .sort({ created_at: -1 })
+    .skip(limit * (page - 1))
+    .limit(limit)
+    .exec();
+
+  const promiseArray = [dataPromise, totalIndexPromise];
+  if (totalDeletedIndexPromise) {
+    promiseArray.push(totalDeletedIndexPromise);
+  }
+
+  const [data, totalNotDeletedIndex, totalDeletedIndex] = await Promise.all(promiseArray);
+
+  const totalIndex = totalNotDeletedIndex - (totalDeletedIndex || 0);
+
+  const totalPage = Math.ceil(totalIndex / limit);
+  const paginationInfo = {
+    totalIndex,
+    totalPage,
+    currentPage: page,
+    nextPage: totalPage > page ? page + 1 : null,
+    previousPage: page > 1 ? page - 1 : null,
+    startingIndex: limit * (page - 1) + 1,
+    endingIndex: limit * page,
+    itemsOnCurrentPage: Math.min(limit, totalIndex - limit * (page - 1)),
+    limit,
+    sortBy: 'created_at',
+    sortOrder: -1
+  };
+
+  return {
+    page: paginationInfo,
+    data,
+  }
+}
+
 }

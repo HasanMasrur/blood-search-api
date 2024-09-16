@@ -18,7 +18,7 @@ export class DeviceInfosService extends Service<DeviceInfos> {
     super(userModel);
   }
   async create(createDeviceInfoDto: CreateDeviceInfoDto, id: Types.ObjectId) {
-    const deviceInfo = await this.findAllByQuery({ device_id: createDeviceInfoDto.device_id, });
+    const deviceInfo = await this.findAllByQuery({ device_id: createDeviceInfoDto.device_id, },);
     const user = await this.userService.findOneUser(id);
     console.log(user);
     const deviceinfo = {
@@ -43,11 +43,9 @@ export class DeviceInfosService extends Service<DeviceInfos> {
   }
 
   async findAll(queryDeviceDto: QueryDeviceDto) {
-
-
     const value = {
-      lng: parseInt(queryDeviceDto.lng, 10),
-      lat: parseInt(queryDeviceDto.lat, 10),
+      lng: +queryDeviceDto.lng,
+      lat:+queryDeviceDto.lat,
       page: queryDeviceDto.page,
       limit: queryDeviceDto.limit,
     }

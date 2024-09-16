@@ -1,13 +1,14 @@
 import { BadRequestException, Body, Injectable, NotFoundException, Type } from '@nestjs/common';
 import { UserDto } from './dto/create-user.dto';
 import { Service } from "src/common/service/service.common";
-import { User } from './entities/user.entity';
+
 import { Model, Types } from 'mongoose';
 import { JwtService } from "@nestjs/jwt";
 import { InjectModel } from '@nestjs/mongoose';
 import { UserLogingDto } from './dto/user-loging.dto';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './schema/user.schema';
 @Injectable()
 export class UserService extends Service<User>{
   
@@ -28,16 +29,18 @@ export class UserService extends Service<User>{
 
   async signIn(@Body()  UserLogingDto: UserLogingDto) {
     console.log(UserLogingDto);
-    const userData = await this.findOneByQuery({
+    const userData = await this.findAllByQuery({
       phone: UserLogingDto.phone,
     });
-    console.log("userdata"+userData);
+
+    console.log("userdata: ",userData);
     if (userData) {
-     console.log(userData['password']);
-      const isMatch = await bcrypt.compare( UserLogingDto.password,userData['password']);
+     console.log(userData[0]?.full_name);
+     console.log(UserLogingDto.password);
+      const isMatch = await bcrypt.compare( UserLogingDto.password,userData[0]?.password,);
       if (isMatch) {
         const token = await this.jwtService.signAsync(
-          { _id:userData['_id'] },
+          { _id:userData[0]._id },
           { secret: process.env.JWT_SECRECT }
         );
 

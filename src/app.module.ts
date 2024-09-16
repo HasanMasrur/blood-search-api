@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { DeviceInfosModule } from './device-infos/device-infos.module';
+import { BloodRequestModule } from './blood-request/blood-request.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -14,7 +15,8 @@ import { DeviceInfosModule } from './device-infos/device-infos.module';
     MongooseModule.forRoot(process.env.DB_URL),
     AuthModule,
     UserModule,
-    DeviceInfosModule
+    DeviceInfosModule,
+    BloodRequestModule
   
   ],
   controllers: [AppController],
