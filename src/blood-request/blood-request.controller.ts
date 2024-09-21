@@ -1,15 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query, HttpException, Type } from '@nestjs/common';
 import { BloodRequestService } from './blood-request.service';
 import { CreateBloodRequestDto } from './dto/create-blood-request.dto';
 import { UpdateBloodRequestDto } from './dto/update-blood-request.dto';
 import { AuthGuard } from 'src/user/auth.guard';
 import { QueryBloodDto } from './dto/query-blood.dto';
+import { QueryBloodIndividulDto } from './dto/query-blood_individul.dto';
+import { Types } from 'mongoose';
 
 @Controller('blood-request')
 export class BloodRequestController {
   constructor(private readonly bloodRequestService: BloodRequestService) {}
-
-  @Post()
+  @Post('create')
   @UseGuards(AuthGuard)
   create(@Req() req: Request, @Body() createBloodRequestDto: CreateBloodRequestDto) {
     console.log(createBloodRequestDto);
@@ -27,15 +28,14 @@ async  findAll(@Query() queryBloodDto:QueryBloodDto) {
     } catch (error) {
       throw new HttpException(error.message, error.status);
     }
-   
   }
 
   @Get('individual')
   @UseGuards(AuthGuard)
-async    findAllIndividual(@Req() req: Request,@Query() queryBloodDto:QueryBloodDto) {
+async    findAllIndividual(@Req() req: Request,@Query() queryBloodIndividulDto:QueryBloodIndividulDto) {
     try {
       console.log(req["user"]["_id"]);
-      return await this.bloodRequestService.findAllIndividual( req['user']['_id'],queryBloodDto);
+      return await this.bloodRequestService.findAllIndividual( req['user']['_id'],queryBloodIndividulDto);
     } catch (error) {
       throw new HttpException(error.message, error.status);
     }
@@ -54,7 +54,9 @@ async    findAllIndividual(@Req() req: Request,@Query() queryBloodDto:QueryBlood
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.bloodRequestService.remove(+id);
+  @UseGuards(AuthGuard)
+  remove(@Param('id') id: Types.ObjectId,) {
+    console.log('id is ',id);
+    return this.bloodRequestService.remove(id);
   }
 }

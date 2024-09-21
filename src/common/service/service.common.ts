@@ -50,7 +50,7 @@ export class Service<TDoc> {
 
     // delete one by id
     protected async removeById(id: Types.ObjectId) {
-        return await this.model.findOneAndUpdate({ _id: id, deletedAt: null }, { deletedAt: new Date() }, { new: true });
+        return await this.model.deleteOne({ _id: id,},);
     }
 
     // delete by query
