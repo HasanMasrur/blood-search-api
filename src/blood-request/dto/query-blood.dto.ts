@@ -1,20 +1,18 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { IPaginate } from 'src/common/dto/common.dto';
 
 export class QueryBloodDto extends IPaginate {
-  @IsOptional()
-  @IsString()
-  _id: string;
 
-  @IsOptional()
-  @IsString()
-  search: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   lat: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   lng: string;
+
+  @IsOptional()
+  @IsString()
+  request_blood_group:String;
 }

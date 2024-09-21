@@ -70,7 +70,6 @@ export class Service<TDoc> {
     if (query['_id']) {
       query['_id'] = new mongoose.Types.ObjectId(query['_id']);
     }
-
     const data = await this.model.aggregate([
       {
         $match: { ...query, deleted_at: null },
@@ -137,28 +136,22 @@ export class Service<TDoc> {
   }
   protected async findByPaginateNear(
     query: object = {},
+    location:any={},
     paginate?: IPaginate,
     lookupStages: any[] = [],
   ) {
     const page = Math.abs(Number(paginate?.page || 0) || this.DEFAULT_PAGE);
     const limit = Math.abs(Number(paginate?.limit || 0) || this.DEFAULT_LIMIT);
 
-    if (query['_id']) {
-      query['_id'] = new mongoose.Types.ObjectId(query['_id']);
-    }
-console.log(query);
+    // if (query['_id']) {
+    //   query['_id'] = new mongoose.Types.ObjectId(query['_id']);
+    // }
+console.log("location" ,query);
     const data = await this.model.aggregate([
-{
-  $geoNear: {
-    near: { type: "Point", coordinates: [query['lng'], query['lat']] },
-    distanceField: "dist.calculated",
-    maxDistance: 100,  // Specify max distance (in meters)
-    spherical: true
-  }
-},
-      // {
-      //   $match: { ...query, deleted_at: null },
-      // },
+      location,
+      {
+        $match: { ...query, deleted_at: null },
+      },
       {
         $facet: {
           page: [

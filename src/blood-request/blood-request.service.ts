@@ -12,7 +12,7 @@ import { QueryBloodDto } from './dto/query-blood.dto';
 
 
 @Injectable()
-export class BloodRequestService  extends Service<BloodRequest>{
+export class BloodRequestService extends Service<BloodRequest> {
 
   constructor(
     private readonly userService: UserService,
@@ -20,7 +20,7 @@ export class BloodRequestService  extends Service<BloodRequest>{
     private jwtService: JwtService,) {
     super(bloodModel);
   }
-  async create(  id: Types.ObjectId, createBloodRequestDto: CreateBloodRequestDto,) {
+  async create(id: Types.ObjectId, createBloodRequestDto: CreateBloodRequestDto,) {
     const user = await this.userService.findOneUser(id);
     const bloodRequest = {
       full_name: user['full_name'],
@@ -38,19 +38,27 @@ export class BloodRequestService  extends Service<BloodRequest>{
   }
 
   async findAll(queryBloodDto: QueryBloodDto) {
-    const value = {
-      lng: +queryBloodDto.lng,
-      lat:+queryBloodDto.lat,
-      page: queryBloodDto.page,
-      limit: queryBloodDto.limit,
+    const { page, limit, request_blood_group,lat,lng, ...restQuery } = queryBloodDto;
+
+    if (request_blood_group) {
+      restQuery['request_blood_group'] = request_blood_group;
     }
-    const { page, limit, ...restQuery } = value;
-    return await this.findByPaginateNear(restQuery, { page, limit });
+   
+console.log(restQuery);
+const location = {
+  $geoNear: {
+    near: { type: "Point", coordinates: [+lng, +lat] },
+    distanceField: "dist.calculated",
+    maxDistance: 100,  // Specify max distance (in meters)
+    spherical: true
+  }
+};
+    return await this.findByPaginateNear(restQuery,location, { page, limit });
   }
 
   async findAllIndividual(id: Types.ObjectId, queryBloodDto: QueryBloodDto) {
     const value = {
-      user_id :id,
+      user_id: id,
       page: queryBloodDto.page,
       limit: queryBloodDto.limit,
     }
