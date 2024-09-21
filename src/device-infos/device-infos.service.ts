@@ -8,6 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from 'src/user/user.service';
 import { QueryDeviceDto } from './dto/query-user.dto';
+import { QueryBloodIndividulDto } from 'src/blood-request/dto/query-blood_individul.dto';
 @Injectable()
 export class DeviceInfosService extends Service<DeviceInfos> {
 
@@ -18,40 +19,67 @@ export class DeviceInfosService extends Service<DeviceInfos> {
     super(userModel);
   }
   async create(createDeviceInfoDto: CreateDeviceInfoDto, id: Types.ObjectId) {
-    const deviceInfo = await this.findAllByQuery({ device_id: createDeviceInfoDto.device_id, },);
+    const deviceInfo = await this.findOneByQuery({ device_id: createDeviceInfoDto.device_id, },);
     const user = await this.userService.findOneUser(id);
     console.log(user);
     const deviceinfo = {
-      full_name: user['full_name'],
-      user_id: user['_id'],
-      phone_number: user['phone'],
-      country_code: user['country_code'],
-      email: user['email'],
-      blood_group: user['blood_group'],
-      login_status: createDeviceInfoDto.login_status,
+      full_name: user.full_name,
+      user_id: user.id,
+      phone_number: user.phone,
+      country_code: user.country_code,
+      email: user.email,
+      blood_group: user.blood_group,
+      login_status: true,
       fcm_token: createDeviceInfoDto.fcm_token,
       device_id: createDeviceInfoDto.device_id,
       location: { coordinates: [createDeviceInfoDto.location.lng, createDeviceInfoDto.location.lat] }
     }
-    if (!deviceInfo || !deviceInfo.length) {
+ 
+    if (!deviceInfo) {
       return await this.createOne(deviceinfo);
     } else {
-      console.log(deviceInfo[0]['_id']);
-      return await this.updateById(deviceInfo[0]['_id'], deviceinfo);
+      console.log("device",deviceInfo, "deviceinfo",deviceinfo);
+      console.log(deviceInfo.id);
+      return await this.updateById(deviceInfo.id, deviceinfo);
 
     }
   }
+
 
   async findAll(queryDeviceDto: QueryDeviceDto) {
-    const value = {
-      lng: +queryDeviceDto.lng,
-      lat:+queryDeviceDto.lat,
-      page: queryDeviceDto.page,
-      limit: queryDeviceDto.limit,
+    const { page, limit, blood_group, lat, lng, ...restQuery } = queryDeviceDto;
+console.log(blood_group);
+    if (blood_group) {
+      // + symbol is a special character in URLs
+      restQuery['blood_group'] = bloodGroupName(blood_group);
     }
-    const { page, limit, ...restQuery } = value;
-    return await this.findByPaginateNear(restQuery, { page, limit });
+    console.log(restQuery);
+    const location = {
+      $geoNear: {
+        near: { type: "Point", coordinates: [+lng, +lat] },
+        distanceField: "dist.calculated",
+        maxDistance: 100,  // Specify max distance (in meters)
+        spherical: true
+      }
+    };
+    return await this.findByPaginateNear(restQuery, location, { page, limit });
   }
+
+  async findAllIndividual(id: Types.ObjectId, queryBloodIndividulDto: QueryBloodIndividulDto) {
+    const { page, limit,  _id, ...restQuery } = queryBloodIndividulDto;
+   
+    if(id){
+      restQuery["user_id"] = id;
+    }
+    console.log(restQuery);
+    return await this.findAllByQueryPagination(restQuery, { page, limit });
+  }
+
+
+
+
+
+
 
   findOne(id: number) {
     return `This action returns a #${id} deviceInfo`;
@@ -62,7 +90,31 @@ export class DeviceInfosService extends Service<DeviceInfos> {
     return await this.updateById(id, updateDeviceInfoDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} deviceInfo`;
+  async remove(id: Types.ObjectId,userId: Types.ObjectId, ) {
+    return  await this.removeByQuery({_id:id})
   }
 }
+
+
+function bloodGroupName( value) {
+  switch (value) {
+    case 'O': 
+      return 'O+';
+    case 'B': 
+      return 'B+';
+    case 'A':
+      return 'A+';
+    case 'AB': 
+      return 'A+';
+    case 'O-': 
+      return 'O-';
+    case 'B-': 
+      return 'B-';
+    case 'A-': 
+      return 'A-';
+    case 'AB-': 
+      return 'AB-';
+    default:
+      return ''
+  }
+  }

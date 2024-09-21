@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { IPaginate } from 'src/common/dto/common.dto';
 
 export class QueryDeviceDto extends IPaginate {
@@ -8,13 +8,13 @@ export class QueryDeviceDto extends IPaginate {
 
   @IsOptional()
   @IsString()
-  search: string;
+  blood_group: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   lat: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   lng: string;
 }

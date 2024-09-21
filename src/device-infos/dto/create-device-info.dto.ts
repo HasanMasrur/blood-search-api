@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Type } from "class-transformer";
-import { IsBoolean, IsNotEmpty, IsNumber, IsObject, IsString, ValidateNested } from "class-validator";
-
+import { IsBoolean, IsNotEmpty, IsNumber,  IsString, ValidateNested } from "class-validator";
 
 
 export class ILocation {
@@ -15,17 +14,13 @@ export class ILocation {
 }
 
 export class CreateDeviceInfoDto {
-     @IsNotEmpty()
+    @IsNotEmpty()
     @IsString()
     device_id: string;
 
-     @IsNotEmpty()
+    @IsNotEmpty()
     @IsString()
     fcm_token: string;
-
-     @IsNotEmpty()
-    @IsBoolean()
-    login_status: boolean;
 
     @IsNotEmpty()
     @ValidateNested()

@@ -55,7 +55,7 @@ export class Service<TDoc> {
 
     // delete by query
     protected async removeByQuery(query: object) {
-        return await this.model.updateMany({ ...query, deletedAt: null }, { deletedAt: new Date() });
+        return await this.model.deleteOne({ ...query, deletedAt: null }, { deletedAt: new Date() });
     }
 
      // find by paginate

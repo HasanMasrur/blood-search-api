@@ -6,6 +6,8 @@ import { AuthGuard } from 'src/user/auth.guard';
 import { UserService } from 'src/user/user.service';
 import { QueryDeviceDto } from './dto/query-user.dto';
 import { MongoIdParams } from 'src/common/dto/common.dto';
+import { QueryBloodIndividulDto } from 'src/blood-request/dto/query-blood_individul.dto';
+import { Types } from 'mongoose';
 @Controller('device-infos')
 export class DeviceInfosController {
   constructor(private readonly deviceInfosService: DeviceInfosService, private readonly UserService: UserService) {}
@@ -32,6 +34,18 @@ async  findAll(@Query() QueryDeviceDto:QueryDeviceDto) {
    
   }
 
+  @Get('individual')
+  @UseGuards(AuthGuard)
+async    findAllIndividual(@Req() req: Request,@Query() queryBloodIndividulDto:QueryBloodIndividulDto) {
+    try {
+      console.log(req["user"]["_id"]);
+      return await this.deviceInfosService.findAllIndividual( req['user']['_id'],queryBloodIndividulDto);
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
+   
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.deviceInfosService.findOne(+id);
@@ -51,7 +65,13 @@ async  findAll(@Query() QueryDeviceDto:QueryDeviceDto) {
 
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.deviceInfosService.remove(+id);
-  }
-}
+  @UseGuards(AuthGuard)
+  remove( @Req() req: Request , @Param('id') id: Types.ObjectId,) {
+    try {
+      console.log('id is ',id);
+      console.log(req["user"]["_id"]);
+      return this.deviceInfosService.remove(id,req["user"]["_id"]);
+    } catch (error) {
+      throw error;
+    }
+  }}
