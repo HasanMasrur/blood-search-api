@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Type } from "class-transformer";
-import { IsBoolean, IsNotEmpty, IsNumber, IsObject, IsString, ValidateNested } from "class-validator";
+import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, ValidateNested } from "class-validator";
+import { BloodGroupTypeEnum } from "../blood-group-type_enum";
 
 
 export class ILocation {
@@ -15,12 +16,16 @@ export class ILocation {
 
 export class CreateBloodRequestDto {
     @IsNotEmpty()
-    @IsString()
-    blood_group: string;
+    @IsEnum(BloodGroupTypeEnum)
+    blood_group: BloodGroupTypeEnum;
 
     @IsNotEmpty()
     @IsString()
     hospital_name: string;
+    
+    @IsOptional()
+    @IsString()
+    message: string;
 
     @IsNotEmpty()
     @IsString()

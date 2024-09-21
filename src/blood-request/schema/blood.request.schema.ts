@@ -50,6 +50,8 @@ export class BloodRequest {
 
     @Prop()
     contact_number: string;
+    @Prop()
+    message: string;
 
 }
 

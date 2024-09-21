@@ -32,37 +32,40 @@ export class BloodRequestService extends Service<BloodRequest> {
       request_blood_group: createBloodRequestDto.blood_group,
       hospital_name: createBloodRequestDto.hospital_name,
       contact_number: createBloodRequestDto.contact_number,
+      message: createBloodRequestDto.message,
       location: { coordinates: [createBloodRequestDto.location.lng, createBloodRequestDto.location.lat] }
     }
     return await this.createOne(bloodRequest);
   }
 
   async findAll(queryBloodDto: QueryBloodDto) {
-    const { page, limit, request_blood_group,lat,lng, ...restQuery } = queryBloodDto;
+    const { page, limit, request_blood_group, lat, lng, ...restQuery } = queryBloodDto;
 
     if (request_blood_group) {
       restQuery['request_blood_group'] = request_blood_group;
     }
-   
-console.log(restQuery);
-const location = {
-  $geoNear: {
-    near: { type: "Point", coordinates: [+lng, +lat] },
-    distanceField: "dist.calculated",
-    maxDistance: 100,  // Specify max distance (in meters)
-    spherical: true
-  }
-};
-    return await this.findByPaginateNear(restQuery,location, { page, limit });
+
+    console.log(restQuery);
+    const location = {
+      $geoNear: {
+        near: { type: "Point", coordinates: [+lng, +lat] },
+        distanceField: "dist.calculated",
+        maxDistance: 100,  // Specify max distance (in meters)
+        spherical: true
+      }
+    };
+    return await this.findByPaginateNear(restQuery, location, { page, limit });
   }
 
   async findAllIndividual(id: Types.ObjectId, queryBloodDto: QueryBloodDto) {
-    const value = {
-      user_id: id,
-      page: queryBloodDto.page,
-      limit: queryBloodDto.limit,
+    const { page, limit, request_blood_group, lat, lng,_id, ...restQuery } = queryBloodDto;
+    if (request_blood_group) {
+      restQuery['request_blood_group'] = request_blood_group;
     }
-    const { page, limit, ...restQuery } = value;
+    if(_id){
+      restQuery["_id"] = _id;
+    }
+    console.log(restQuery);
     return await this.findAllByQueryPagination(restQuery, { page, limit });
   }
 
