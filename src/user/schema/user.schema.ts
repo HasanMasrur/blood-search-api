@@ -1,19 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-import mongoose from "mongoose";
-import { CommonSchema } from "src/common/schema.common";
-import { DeviceInfo } from "./device-info.schema";
-
-// contact info
-
-
 @Schema({ timestamps: true })
-export class User extends CommonSchema {
+export class User {
     
     @Prop({ unique: true })
     phone: string;
+
     @Prop()
     email?: string;
+
     @Prop()
     full_name: string;
 
@@ -34,9 +29,6 @@ export class User extends CommonSchema {
 
     @Prop()
     password:string;
-
-    @Prop({ type: [DeviceInfo] })
-    delivery_addresses: DeviceInfo[];
 
 }
 

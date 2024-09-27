@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get } from '@nestjs/common';
+import { Body, Controller, Post, Get, HttpException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateOtpDto } from './dto/otp.dto';
 import { OtpVerifyDto } from './dto/otpVerify.dto';
@@ -13,16 +13,34 @@ export class AuthController {
     }
     @Post("send-otp")
     async create(@Body() CreateOtpDto: CreateOtpDto) {
-        console.log(CreateOtpDto);
-        const data = await this.AuthService.otpCreate(CreateOtpDto);
-        return data;
+        try {
+            console.log(CreateOtpDto);
+            const data = await this.AuthService.otpCreate(CreateOtpDto);
+            return data;
+        } catch (error) {
+            throw new HttpException(error.message, error.status);
+        }
     }
 
     @Post("otp-verify")
     async verify(@Body() OtpVerifyDto: OtpVerifyDto) {
-        console.log(OtpVerifyDto);
-        const otp = await this.AuthService.otpVerify(OtpVerifyDto);
-        return otp;
+        try {
+            const otp = await this.AuthService.otpVerify(OtpVerifyDto);
+            return otp;
+        } catch (error) {
+            throw new HttpException(error.message, error.status);
+        }
+    }
+
+    @Post("forget-password")
+    async forgetPassword(@Body() CreateOtpDto: CreateOtpDto) {
+        try {
+            console.log(CreateOtpDto);
+            const data = await this.AuthService.otpCreate(CreateOtpDto);
+            return data;
+        } catch (error) {
+            throw new HttpException(error.message, error.status);
+        }
     }
 
 

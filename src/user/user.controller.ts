@@ -11,7 +11,11 @@ export class UserController {
 
   @Post('login')
   create(@Body() UserLogingDto: UserLogingDto) {
-    return this.userService.signIn(UserLogingDto);
+    try {
+      return this.userService.signIn(UserLogingDto);
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 
   @Get()
@@ -19,9 +23,20 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-  //  return this.userService.findOne(+id);
+  @Get('token')
+  @UseGuards(AuthGuard)
+  async tokenVerify(@Req() req: Request,) {
+    try {
+      console.log(req["user"]["_id"]);
+      const data = await this.userService.findOneUser(req["user"]["_id"],);
+      console.log(data);
+      return {
+        success: true,
+        data,
+      };
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 
 

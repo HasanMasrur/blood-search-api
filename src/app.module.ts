@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { DeviceInfosModule } from './device-infos/device-infos.module';
 import { BloodRequestModule } from './blood-request/blood-request.module';
+import { ForgetPasswordModule } from './forget-password/forget-password.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -16,7 +17,8 @@ import { BloodRequestModule } from './blood-request/blood-request.module';
     AuthModule,
     UserModule,
     DeviceInfosModule,
-    BloodRequestModule
+    BloodRequestModule,
+    ForgetPasswordModule
   
   ],
   controllers: [AppController],

@@ -5,8 +5,7 @@ import { IPaginate } from "../dto/common.dto";
 
 export class Service<TDoc> {
     private DEFAULT_LIMIT = 10;
-    private DEFAULT_PAGE = 1;
-
+    private DEFAULT_PAGE = 1; 
     constructor(private readonly model: Model<TDoc>) { }
 
     // create new
@@ -55,7 +54,7 @@ export class Service<TDoc> {
 
     // delete by query
     protected async removeByQuery(query: object) {
-        return await this.model.deleteOne({ ...query, deletedAt: null }, { deletedAt: new Date() });
+        return await this.model.deleteMany({ ...query, deletedAt: null }, { deletedAt: new Date() });
     }
 
      // find by paginate
