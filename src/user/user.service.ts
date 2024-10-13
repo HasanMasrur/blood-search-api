@@ -1,7 +1,6 @@
 import { BadRequestException, Body, Injectable, NotFoundException, Type } from '@nestjs/common';
 import { UserDto } from './dto/create-user.dto';
 import { Service } from "src/common/service/service.common";
-
 import { Model, Types } from 'mongoose';
 import { JwtService } from "@nestjs/jwt";
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,6 +8,7 @@ import { UserLogingDto } from './dto/user-loging.dto';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schema/user.schema';
+import { log } from 'console';
 @Injectable()
 export class UserService extends Service<User>{
   
@@ -25,7 +25,6 @@ export class UserService extends Service<User>{
     }
     return await this.createOne(userDto);
   }
- 
 
   async signIn(@Body()  userLogingDto: UserLogingDto) {
     console.log(userLogingDto);
@@ -33,9 +32,9 @@ export class UserService extends Service<User>{
       phone: userLogingDto.phone,
       country_code:userLogingDto.country_code,
     });
-
     console.log("userdata: ",userData);
-    if (userData) {
+    if (!userData || userData.length>0) {
+console.log("value is heare");
      console.log(userData[0]?.full_name);
      console.log(userLogingDto.password);
       const isMatch = await bcrypt.compare( userLogingDto.password,userData[0]?.password,);
@@ -44,7 +43,6 @@ export class UserService extends Service<User>{
           { _id:userData[0]._id },
           { secret: process.env.JWT_SECRECT }
         );
-
         return {"accessToken":token,data:{  "_id": userData[0].id,
         "phone": userData[0].phone,
         "full_name": userData[0].full_name,
@@ -54,10 +52,11 @@ export class UserService extends Service<User>{
         "blood_group": userData[0].blood_group,
         "__v": 0}};
       } else {
-        return { message: 'Invalid credentials.' };
+        throw new NotFoundException('Invalid credentials');
+       
       }
     }else {
-      throw new BadRequestException("Incorrect username or password .");
+      throw new NotFoundException("Incorrect username or password .");
     }
 
   }
