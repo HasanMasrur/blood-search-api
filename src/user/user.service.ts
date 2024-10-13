@@ -27,24 +27,32 @@ export class UserService extends Service<User>{
   }
  
 
-  async signIn(@Body()  UserLogingDto: UserLogingDto) {
-    console.log(UserLogingDto);
+  async signIn(@Body()  userLogingDto: UserLogingDto) {
+    console.log(userLogingDto);
     const userData = await this.findAllByQuery({
-      phone: UserLogingDto.phone,
+      phone: userLogingDto.phone,
+      country_code:userLogingDto.country_code,
     });
 
     console.log("userdata: ",userData);
     if (userData) {
      console.log(userData[0]?.full_name);
-     console.log(UserLogingDto.password);
-      const isMatch = await bcrypt.compare( UserLogingDto.password,userData[0]?.password,);
+     console.log(userLogingDto.password);
+      const isMatch = await bcrypt.compare( userLogingDto.password,userData[0]?.password,);
       if (isMatch) {
         const token = await this.jwtService.signAsync(
           { _id:userData[0]._id },
           { secret: process.env.JWT_SECRECT }
         );
 
-        return {"accessToken":token,data:userData};
+        return {"accessToken":token,data:{  "_id": userData[0].id,
+        "phone": userData[0].phone,
+        "full_name": userData[0].full_name,
+        "country_code":userData[0].country_code,
+        "date_of_birth":userData[0].date_of_birth,
+        "gender":userData[0].gender,
+        "blood_group": userData[0].blood_group,
+        "__v": 0}};
       } else {
         return { message: 'Invalid credentials.' };
       }

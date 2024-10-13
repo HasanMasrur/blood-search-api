@@ -8,7 +8,12 @@ export class UserLogingDto {
     @IsNotEmpty()
     @IsString()
     phone: String;
+    
 
+    @IsNotEmpty()
+    @IsString()
+    country_code: String;
+    
     @IsNotEmpty()
     @IsString()
     @MinLength(6)
