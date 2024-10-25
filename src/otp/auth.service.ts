@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { CreateOtpDto } from './dto/otp.dto';
 import { Service } from 'src/common/service/service.common';
 import { Otp } from './schema/otp.schema';
@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from "@nestjs/jwt";
 import { ForgetPasswrodOtpDto } from './dto/forgetpassword.otp';
 import { ForgetPasswordOtp } from './schema/forget.passwort.otp.schema';
+import axios from 'axios';
 @Injectable()
 export class AuthService extends Service<Otp> {
 
@@ -19,6 +20,7 @@ export class AuthService extends Service<Otp> {
         private JwtService: JwtService) {
         super(OtpModel);
     }
+   
 
     async otpCreate(createOtpDto: CreateOtpDto) {
         const userData = await this.userService.findByPhone(createOtpDto.phone_number);
@@ -32,7 +34,25 @@ export class AuthService extends Service<Otp> {
                 const modifiedDto = {
                     ...createOtpDto, password: hash, otp_code: otp_code, time_limit: Date.now(), attempt_at: 1,
                 }
-                return await this.createOne(modifiedDto);
+                console.log("url is :::"+process.env.DB_URL);
+                try {
+                    const response = await axios.get(process.env.apiUrl, {
+                      params: {
+                        api_key: process.env.apiKey,
+                        type: 'text',
+                        number: createOtpDto.country_code+createOtpDto.phone_number,
+                        senderid: process.env.senderId,
+                        message: `Your OTP code is: ${otp_code}\n<#> ${createOtpDto.app_key}`
+                      },
+                    });
+                    console.log('SMS sent successfully:', response.data);
+                    //return response.data;
+                    return await this.createOne(modifiedDto);
+                  } catch (error) {
+                    throw new HttpException(error.message, error.status);
+                  }
+
+              
             } else {
                 const salt = await bcrypt.genSalt();
                 const hash = await bcrypt.hash(createOtpDto.password, salt);
@@ -49,7 +69,24 @@ export class AuthService extends Service<Otp> {
                         blood_group: createOtpDto.blood_group,
                         password: hash,
                     }
-                    return await this.updateById(user[0]._id, updateOtp);
+                    console.log("url is :::"+process.env.apiUrl);
+                    try {
+                        const response = await axios.get(process.env.apiUrl , {
+                          params: {
+                            api_key: process.env.apiKey,
+                            type: 'text',
+                            number: '0'+createOtpDto.phone_number,
+                            senderid: process.env.senderId,
+                            message: `Your OTP code is: ${otp_code}\n<#> ${createOtpDto.app_key}`
+                          },
+                        });
+                        console.log('SMS sent successfully:', response.data);
+                        //return response.data;
+                        return await this.updateById(user[0]._id, updateOtp);
+                      } catch (error) {
+                        console.log(error);
+                        throw new HttpException(error.message, error.status);
+                      }
                 } else {
                     throw new BadRequestException('User attemp limit already exist');
                 }
